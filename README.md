@@ -47,7 +47,7 @@ Users must provide their `DiscordTag` into their Soonaverse profile that is hold
 
 ### Deploying to AWS
 
-An example setup for the Bot can be deploying to AWS inside a lambda function, scheduled to run once per hour. As the functionality for the bot is increased the schedule frequency can be adjusted accordingly, as well as built in functionality can be implemented to trigger parts of the bot from API endpoints.
+An example setup for the Bot can be deploying to AWS inside a lambda function, scheduled to run once per hour. The schedule frequency can be adjusted accordingly as the functionality for the bot is branched out, as well as built in functionality can be implemented to trigger parts of the bot from API endpoints.
 
 The [Serverless Application Model](https://github.com/aws/serverless-application-model) Command Line Interface (SAM CLI) is an extension of the AWS CLI that adds functionality for building and testing Lambda applications. It uses Docker to run your functions in an Amazon Linux environment that matches Lambda. It can also emulate your application's build environment and API.
 
@@ -71,7 +71,7 @@ sam deploy --guided
 
 Strong inspiration taken from `HerrSkull`: [Soonaverse-NFT-Bot](https://github.com/HerrSkull/Soonaverse-NFT-Bot).
 
-The crew used TypeScript for convenience, and implemented custom logic to adapt the bot's functioning to the specific characteristics of our NFT collection: *The Big Bang*.
+The crew used TypeScript for convenience, and implemented custom logic to adapt the bot's functioning to the specific characteristics of our NFT collection: [*The Big Bang*](https://nft.tangleswap.exchange/).
 
 ## License
 
