@@ -2,7 +2,7 @@
 
 *Meet H.U.E. — the uber-intelligent AI aboard the Tangleship.*
 
-<img src="https://github.com/TangleSwap/soonaverse-nft-bot/blob/main/src/HUE.png?raw=true" width="415">
+<img src="./docs/HUE.png" width="415">
 
 This bot grants members of a Discord server unique roles depending on the specific NFTs they hold, based on a predefined range of collections.
 
@@ -10,13 +10,13 @@ Users must provide their `DiscordTag` into their Soonaverse profile that is hold
 
 ## Contents
 
-- [Soonaverse-NFT-Bot](#soonaverse-x-discord-tangleswap-nft-bot)
+- [Soonaverse x [Discord](http://chat.tangleswap.exchange): TangleSwap NFT Bot](#soonaverse-x-discord-tangleswap-nft-bot)
   - [Contents](#contents)
   - [Project Structure](#project-structure)
   - [Usage](#usage)
     - [Discord Privileges](#discord-privileges)
     - [Deploying to AWS](#deploying-to-aws)
-  - [Credits and Thanks](#credits-and-thanks)
+  - [Acknowledgements](#acknowledgements)
   - [License](#license)
 
 ## Project Structure

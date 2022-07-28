@@ -124,36 +124,32 @@ export class RoleManager {
                             // console.log("--------------");
 
                             // remove them from other roles they are no longer a part of
-                            // memberRoles.forEach((role) => {
-                            // 	if (role.id in this.roleIds && !(role.id in allocateRoles)) {
-                            // 		member.roles.remove(role.id).then((member) => {
-                            // 			console.log(
-                            // 				member.user.tag + " - removed role: " + role.id
-                            // 			);
-                            // 		});
-                            // 	}
-                            // });
+                            memberRoles.forEach((role) => {
+                                if (role.id in this.roleIds && !(role.id in allocateRoles)) {
+                                    member.roles.remove(role.id).then((member) => {
+                                        console.log(member.user.tag + ' - removed role: ' + role.id);
+                                    });
+                                }
+                            });
 
                             // If member does not have the role, add them to it
                             for (const roleId of allocateRoles) {
                                 if (!memberRoles.has(roleId)) {
-                                    console.log(member.user.tag + ' - added role: ' + roleId);
-                                    // member.roles.add(roleId, "NFT-Holder").then((member) => {
-                                    // 	console.log(member.user.tag + " - added role: " + roleId);
-                                    // });
+                                    // console.log(member.user.tag + ' - added role: ' + roleId);
+                                    member.roles.add(roleId, 'NFT-Holder').then((member) => {
+                                        console.log(member.user.tag + ' - added role: ' + roleId);
+                                    });
                                 }
                             }
                         } else {
                             // otherwise for each role in the table remove them from it
-                            // memberRoles.forEach((role) => {
-                            // 	if (role.id in this.roleIds) {
-                            // 		member.roles.remove(role.id).then((member) => {
-                            // 			console.log(
-                            // 				member.user.tag + " - removed role: " + role.id
-                            // 			);
-                            // 		});
-                            // 	}
-                            // });
+                            memberRoles.forEach((role) => {
+                                if (role.id in this.roleIds) {
+                                    member.roles.remove(role.id).then((member) => {
+                                        console.log(member.user.tag + ' - removed role: ' + role.id);
+                                    });
+                                }
+                            });
                         }
                     }),
                 );
