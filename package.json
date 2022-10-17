@@ -1,0 +1,30 @@
+{
+    "name": "soonaverse-nft-bot",
+    "version": "1.0.1",
+    "description": "",
+    "repository": "https://github.com/TangleSwap/nft-bot",
+    "author": "tangular",
+    "license": "MIT",
+    "engines": {
+        "node": "16"
+    },
+    "keywords": [
+        "discord",
+        "soonaverse",
+        "tangleswap"
+    ],
+    "scripts": {
+		"start": "ts-node src/main.ts"
+    },
+    "dependencies": {
+        "discord.js": "^13.6.0",
+        "dotenv": "^16.0.1",
+        "soonaverse": "^0.1.14"
+    },
+    "devDependencies": {
+        "@tsconfig/node16": "^1.0.3",
+        "@types/node": "^18.0.3",
+        "ts-node": "^10.8.2",
+        "typescript": "^4.7.4"
+    }
+}

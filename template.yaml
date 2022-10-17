@@ -5,8 +5,8 @@ Description: >
 
 Globals:
   Function:
-    Timeout: 60
-    MemorySize: 102
+    Timeout: 120
+    MemorySize: 2048
 
 Resources:
   RoleFunction:

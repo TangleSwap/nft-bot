@@ -1,42 +1,36 @@
-import { Roles } from './roleManager';
-
 // Discord-API Bot-Tokenexport
-export const BOT_TOKEN = ''; // TODO populate this
+export const BOT_TOKEN = '';
 
-// Ids of the NFT-Collections on Soonaverse currently maximum 10
+// A List of Treasury-Wallets
+export const WALLET_LIST = [
+    'YOUR_WALLET_ADDRESS_1',
+    'YOUR_WALLET_ADDRESS_2',
+    'YOUR_WALLET_ADDRESS_2',
+    'YOUR_WALLET_ADDRESS_2',
+    'YOUR_WALLET_ADDRESS_2',
+];
+
+// Ids of the NFT-Collections on Soonaverse currently maximum 10 supported
 export const COLLECTION_IDS = ['0x287eb6a8c83a352debe57bf0f3a96f30ff734825'];
 
 // Id of the discord server
 export const GUILD_ID = '995435565405196399';
 
-// Roles depending on the minimum amount of NFT hold
-// Object keyed by nftType then required number of those NFTs and then
-// the role that gives you. This means a user will be given one role per
-// nft group
-export const ROLES: Roles = {
-    Palm: {
-        '1': '999610366839496704',
-        '5': '999610688681037904',
-        '10': '999610766124654662',
-    },
-    Floating: {
-        '1': '999610813243478046',
-        '5': '999610933674528798',
-        '10': '999610974128582717',
-    },
-    Tranquillity: {
-        '1': '999611058354393168',
-        '5': '999611131154927649',
-        '10': '999611278517616640',
-    },
-    Ascension: {
-        '1': '999611309685489674',
-        '5': '999611362433040424',
-        '10': '999611412273959012',
-    },
-    Night: {
-        '1': '999611525935415336',
-        '5': '999611595707654175',
-        '10': '999611644982341693',
-    },
+// Enable NFT-RoleManager feature
+export const GRANT_ROLES_TO_NFT_HOLDERS = true;
+
+// Enable treasury as nickname
+export const SHOW_TREASURY_INFO = false;
+
+export type roleObj = {
+    roleid: string;
+    reqNFTs: number;
 };
+
+// A table of roles depending on the minimum amount of NFT hold, only role 0 and
+// the highest role is granted
+export const ROLES_TABLE: roleObj[] = [
+    // { roleid: "997611833454243850", reqNFTs: 0 }, // 0 is granted to every NFT-Owner
+    { roleid: '997605748546752594', reqNFTs: 1 }, // 0 is granted to every NFT-Owner
+    { roleid: '997605909633187870', reqNFTs: 20 },
+];
