@@ -11,7 +11,7 @@ export const WALLET_LIST = [
 ];
 
 // Ids of the NFT-Collections on Soonaverse currently maximum 10 supported
-export const COLLECTION_IDS = ['0x287eb6a8c83a352debe57bf0f3a96f30ff734825'];
+export const COLLECTION_ID = ['0x287eb6a8c83a352debe57bf0f3a96f30ff734825'];
 
 // Id of the discord server
 export const GUILD_ID = '995435565405196399';

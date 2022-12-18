@@ -1,10 +1,8 @@
 import { DISCORD_CLIENT } from './main';
-import { Soon } from './soonaverse';
-import { COLLECTION_IDS, GUILD_ID, ROLES } from './config';
+import { SoonaverseApiManager } from './soonaverseApiManager';
+import { COLLECTION_ID, GUILD_ID, ROLES } from './config';
+
 const CHUNK_SIZE = 10;
-
-const SOONAVERSE_CLIENT = new Soon();
-
 export interface NftRoles {
     [reqNftCount: string]: string;
 }
@@ -22,47 +20,57 @@ Object.values(ROLES).forEach((nftRoles) => {
 
 export async function updateCurrentHolders() {
     console.log('Getting Current Holders');
-    await SOONAVERSE_CLIENT.getNftsByCollections(COLLECTION_IDS).then(async (nfts) => {
-        const addressToNfts = new Map<string, Map<string, number>>();
-        const ownerAddresses: string[] = [];
-        nfts.forEach((nftObj) => {
-            const owner: string = nftObj['owner']!;
-            // 'XXX Tranquillity Avenue' get Tranquillity
-            const nftType = nftObj['name'].split(' ', 2)[1];
+    const nfts: any = await SoonaverseApiManager.getNftsByCollection(COLLECTION_ID);
+    const addressToNfts = new Map<string, Map<string, number>>();
+    const ownerAddresses: string[] = [];
+    nfts.forEach((nftObj: any) => {
+        const owner: string = nftObj['owner']!;
+        // 'XXX Tranquillity Avenue' get Tranquillity
+        const nftType = nftObj['name'].split(' ', 2)[1];
 
-            if (addressToNfts.has(owner)) {
-                const ownerNfts = addressToNfts.get(owner)!;
-                let nftCount = 0;
-                if (ownerNfts?.has(nftType)) {
-                    nftCount = ownerNfts.get(nftType)!;
-                }
-                ownerNfts.set(nftType, nftCount + 1);
-            } else {
-                ownerAddresses.push(owner);
-                const ownerNfts = new Map<string, number>();
-                ownerNfts.set(nftType, 1);
-                addressToNfts.set(owner, ownerNfts);
+        if (addressToNfts.has(owner)) {
+            const ownerNfts = addressToNfts.get(owner)!;
+            let nftCount = 0;
+            if (ownerNfts?.has(nftType)) {
+                nftCount = ownerNfts.get(nftType)!;
+            }
+            ownerNfts.set(nftType, nftCount + 1);
+        } else {
+            ownerAddresses.push(owner);
+            const ownerNfts = new Map<string, number>();
+            ownerNfts.set(nftType, 1);
+            addressToNfts.set(owner, ownerNfts);
+        }
+    });
+
+    let discordToNfts = await getDiscordToNfts(ownerAddresses, addressToNfts)
+
+    await syncBatchRoles(discordToNfts);
+}
+
+function delay(ms: number) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function getDiscordToNfts(ownerAddresses: string[], addressToNfts: Map<string, Map<string, number>>) {
+    const chunked_addresses: string[][] = [];
+    for (let i = 0; i < ownerAddresses.length; i += CHUNK_SIZE) {
+        chunked_addresses.push(ownerAddresses.slice(i, i + CHUNK_SIZE));
+    }
+    const discordToNfts = new Map();
+    for (let i = 0; i < chunked_addresses.length; i++) {
+        await delay(1000);
+        let addresses = chunked_addresses[i];
+        addresses.forEach(async (address) => {
+            const member = await SoonaverseApiManager.getMemberById(address);
+            if (member.discord) {
+                discordToNfts.set(member.discord, addressToNfts.get(member.uid));
             }
         });
-
-        const chunked_addresses: string[][] = [];
-        for (let i = 0; i < ownerAddresses.length; i += CHUNK_SIZE) {
-            chunked_addresses.push(ownerAddresses.slice(i, i + CHUNK_SIZE));
-        }
-        const discordToNfts = new Map();
-        await Promise.all(
-            chunked_addresses.map(async (addresses) => {
-                const members = await SOONAVERSE_CLIENT.getMemberByIds(addresses);
-                members.forEach((member) => {
-                    if (member.discord) {
-                        discordToNfts.set(member.discord, addressToNfts.get(member.uid));
-                    }
-                });
-            }),
-        );
-        await syncBatchRoles(discordToNfts);
-    });
+    }
+    return discordToNfts;
 }
+
 
 function rolesToAllocate(membersNfts: Map<string, number>): Set<string> {
     const allocateRoles: Set<string> = new Set();

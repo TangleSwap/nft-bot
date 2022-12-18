@@ -23,15 +23,18 @@ Users must provide their `DiscordTag` into their Soonaverse profile that is hold
 
 ```bash
 .
-├── .gitignore
 ├── LICENSE
 ├── README.md
+├── docs
+│   └── HUE.png
+├── package-lock.json
 ├── package.json
 ├── src
 │   ├── config-example.ts
 │   ├── main.ts
-│   ├── nftRoleManager.ts
-│   └── treasuryManager.ts
+│   ├── roleManager.ts
+│   └── soonaverseApiManager.ts
+├── template.yaml
 └── tsconfig.json
 
 1 directory, 9 files

@@ -16,12 +16,13 @@ async function update() {
     console.log('-----------------------------------------------------');
     var now = new Date();
     console.log(now.toUTCString());
-    await updateCurrentHolders();
     try {
-        // await updateCurrentHolders();
+        await updateCurrentHolders();
     } catch (error) {
-        throw error;
         console.error(error);
+        // lets not throw an error and just let the bot try again next
+        // time
+        // throw error;
     }
     setTimeout(update, INTERVAL);
 }
