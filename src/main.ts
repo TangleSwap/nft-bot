@@ -19,10 +19,7 @@ async function update() {
     try {
         await updateCurrentHolders();
     } catch (error) {
-        console.error(error);
-        // lets not throw an error and just let the bot try again next
-        // time
-        // throw error;
+        console.log(error);
     }
     setTimeout(update, INTERVAL);
 }

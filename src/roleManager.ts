@@ -1,6 +1,6 @@
+import { COLLECTION_ID, GUILD_ID, ROLES } from './config';
 import { DISCORD_CLIENT } from './main';
 import { SoonaverseApiManager } from './soonaverseApiManager';
-import { COLLECTION_ID, GUILD_ID, ROLES } from './config';
 
 const CHUNK_SIZE = 10;
 export interface NftRoles {
@@ -62,7 +62,13 @@ async function getDiscordToNfts(ownerAddresses: string[], addressToNfts: Map<str
         await delay(1000);
         let addresses = chunked_addresses[i];
         addresses.forEach(async (address) => {
-            const member = await SoonaverseApiManager.getMemberById(address);
+            let member = null;
+            while (member == undefined) {
+                try {
+                    member = await SoonaverseApiManager.getMemberById(address);
+                } catch (error) { console.log("Throttling error, retrying"); await delay(1000) };
+
+            }
             if (member.discord) {
                 discordToNfts.set(member.discord, addressToNfts.get(member.uid));
             }
@@ -94,63 +100,57 @@ function rolesToAllocate(membersNfts: Map<string, number>): Set<string> {
 
 async function syncBatchRoles(nftHolders: Map<string, Map<string, number>>) {
     console.log('Syncing Roles');
-    await DISCORD_CLIENT.guilds.fetch(GUILD_ID).then(async (guild: { members: { fetch: () => Promise<any> } }) => {
-        await guild.members.fetch().then(async (members) => {
-            await Promise.all(
-                members.map(async (member: any) => {
-                    const memberRoles = member.roles.cache;
+    // console.log(nftHolders);
+    let guild = await DISCORD_CLIENT.guilds.fetch(GUILD_ID);
+    await guild.members.fetch().then(async (members) => {
+        for (const memberList of members) {
+            const member = memberList[1];
+            const memberRoles = member.roles.cache;
 
-                    if (nftHolders.has(member.user.tag)) {
-                        const membersNfts: Map<string, number> = nftHolders.get(member.user.tag)!;
+            if (nftHolders.has(member.user.tag)) {
+                const membersNfts: Map<string, number> = nftHolders.get(member.user.tag)!;
 
-                        let totalNftCount = 0;
-                        membersNfts.forEach((val) => {
-                            totalNftCount += val;
-                        });
+                let totalNftCount = 0;
+                membersNfts.forEach((val) => {
+                    totalNftCount += val;
+                });
 
-                        const allocateRoles: Set<string> = rolesToAllocate(membersNfts);
+                const allocateRoles: Set<string> = rolesToAllocate(membersNfts);
 
-                        // user info
-                        // console.log("--------------");
-                        // console.log(member.user.tag);
-                        // console.log(membersNfts);
-                        // console.log(nftCount);
-                        // console.log(roleId);
-                        // console.log("--------------");
+                // user info
+                // console.log("--------------");
+                // console.log(member.user.tag);
+                // console.log(membersNfts);
+                // console.log(nftCount);
+                // console.log(roleId);
+                // console.log("--------------");
 
-                        // remove them from other roles they are no longer a part of
-                        memberRoles.forEach(async (role: { id: string }) => {
-                            if (role.id in ROLE_IDS && !(role.id in allocateRoles)) {
-                                await member.roles.remove(role.id).then((member: { user: { tag: string } }) => {
-                                    console.log(member.user.tag + ' - removed role: ' + role.id);
-                                });
-                            }
-                        });
-
-                        // If member does not have the role, add
-                        // them to it
-                        for (const roleId of allocateRoles) {
-                            if (!memberRoles.has(roleId)) {
-                                await member.roles
-                                    .add(roleId, 'NFT-Holder')
-                                    .then((member: { user: { tag: string } }) => {
-                                        console.log(member.user.tag + ' - added role: ' + roleId);
-                                    });
-                            }
-                        }
-                    } else {
-                        // otherwise for each role in the table remove them from it
-                        memberRoles.forEach(async (role: { id: string }) => {
-                            if (role.id in ROLE_IDS) {
-                                await member.roles.remove(role.id).then((member: { user: { tag: string } }) => {
-                                    console.log(member.user.tag + ' - removed role: ' + role.id);
-                                });
-                            }
-                        });
+                // remove them from other roles they are no longer a part of
+                for (const roleList of memberRoles) {
+                    const role = roleList[1];
+                    if (ROLE_IDS.has(role.id) && !(allocateRoles.has(role.id))) {
+                        await member.roles.remove(role.id);
+                        console.log(member.user.tag + ' - removed role: ' + role.id);
                     }
-                }),
-            );
-        });
+                }
+                // If member does not have the role, add them to it
+                for (const roleId of allocateRoles) {
+                    if (!memberRoles.has(roleId)) {
+                        await member.roles.add(roleId, 'NFT-Holder');
+                        console.log(member.user.tag + ' - added role: ' + roleId);
+                    }
+                }
+            } else {
+                // otherwise for each role in the table remove them from it
+                for (const roleList of memberRoles) {
+                    const role = roleList[1];
+                    if (ROLE_IDS.has(role.id)) {
+                        await member.roles.remove(role.id);
+                        console.log(member.user.tag + ' - removed role: ' + role.id);
+                    }
+                }
+            }
+        }
     });
     console.log('Finished syncing roles');
 }
