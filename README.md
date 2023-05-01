@@ -8,17 +8,6 @@ This bot grants members of a Discord server unique roles depending on the specif
 
 Users must provide their `DiscordTag` into their Soonaverse profile that is holding the relevant NFT(s).
 
-## Contents
-
-- [Soonaverse x [Discord](http://chat.tangleswap.exchange): TangleSwap NFT Bot](#soonaverse-x-discord-tangleswap-nft-bot)
-  - [Contents](#contents)
-  - [Project Structure](#project-structure)
-  - [Usage](#usage)
-    - [Discord Privileges](#discord-privileges)
-    - [Deploying to AWS](#deploying-to-aws)
-  - [Acknowledgements](#acknowledgements)
-  - [License](#license)
-
 ## Project Structure
 
 ```bash
@@ -69,13 +58,3 @@ sam local invoke
 # to also deploy after configuring aws credentials
 sam deploy --guided
 ```
-
-## Acknowledgements
-
-Strong inspiration taken from `HerrSkull`: [Soonaverse-NFT-Bot](https://github.com/HerrSkull/Soonaverse-NFT-Bot).
-
-The crew used TypeScript for convenience, and implemented custom logic to adapt the bot's functioning to the specific characteristics of our NFT collection: [*The Big Bang*](https://nft.tangleswap.exchange/).
-
-## License
-
-[MIT](/soonaverse-nft-bot/blob/main/LICENSE)
