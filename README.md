@@ -1,4 +1,4 @@
-# [Soonaverse](https://soonaverse.com/collection/0x287eb6a8c83a352debe57bf0f3a96f30ff734825) x [Discord](http://chat.tangleswap.exchange): TangleSwap NFT Bot
+# TangleSwap NFT [Discord](http://chat.tangleswap.exchange) Bot 🤖
 
 *Meet H.U.E. — the uber-intelligent AI aboard the Tangleship.*
 
