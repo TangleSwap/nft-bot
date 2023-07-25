@@ -43,7 +43,7 @@ export async function updateCurrentHolders() {
         }
     });
 
-    let discordToNfts = await getDiscordToNfts(ownerAddresses, addressToNfts)
+    const discordToNfts = await getDiscordToNfts(ownerAddresses, addressToNfts)
 
     await syncBatchRoles(discordToNfts);
 }
@@ -51,6 +51,15 @@ export async function updateCurrentHolders() {
 function delay(ms: number) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
+
+function ensureHashtagDigits(str: string): string {
+    const pattern = /#(\d{4})$/;
+    if (!pattern.test(str)) {
+        return str + "#0";
+    }
+    return str;
+}
+
 
 async function getDiscordToNfts(ownerAddresses: string[], addressToNfts: Map<string, Map<string, number>>) {
     const chunked_addresses: string[][] = [];
@@ -70,7 +79,8 @@ async function getDiscordToNfts(ownerAddresses: string[], addressToNfts: Map<str
 
             }
             if (member.discord) {
-                discordToNfts.set(member.discord, addressToNfts.get(member.uid));
+                const memberTag = ensureHashtagDigits(member.discord);
+                discordToNfts.set(memberTag, addressToNfts.get(member.uid));
             }
         });
     }
