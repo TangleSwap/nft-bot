@@ -1,6 +1,6 @@
-import { COLLECTION_ID, GUILD_ID, ROLES } from './config';
-import { DISCORD_CLIENT } from './main';
-import { SoonaverseApiManager } from './soonaverseApiManager';
+import { COLLECTION_ID, GUILD_ID, ROLES } from "./config";
+import { DISCORD_CLIENT } from "./main";
+import { getMemberById, getNftsByCollection } from "./soonaverseApiManager";
 
 const CHUNK_SIZE = 10;
 export interface NftRoles {
@@ -19,14 +19,14 @@ Object.values(ROLES).forEach((nftRoles) => {
 });
 
 export async function updateCurrentHolders() {
-    console.log('Getting Current Holders');
-    const nfts: any = await SoonaverseApiManager.getNftsByCollection(COLLECTION_ID);
+    console.log("Getting Current Holders");
+    const nfts: any = await getNftsByCollection(COLLECTION_ID);
     const addressToNfts = new Map<string, Map<string, number>>();
     const ownerAddresses: string[] = [];
     nfts.forEach((nftObj: any) => {
-        const owner: string = nftObj['owner']!;
+        const owner: string = nftObj["owner"]!;
         // 'XXX Tranquillity Avenue' get Tranquillity
-        const nftType = nftObj['name'].split(' ', 2)[1];
+        const nftType = nftObj["name"].split(" ", 2)[1];
 
         if (addressToNfts.has(owner)) {
             const ownerNfts = addressToNfts.get(owner)!;
@@ -43,25 +43,19 @@ export async function updateCurrentHolders() {
         }
     });
 
-    const discordToNfts = await getDiscordToNfts(ownerAddresses, addressToNfts)
+    const discordToNfts = await getDiscordToNfts(ownerAddresses, addressToNfts);
 
     await syncBatchRoles(discordToNfts);
 }
 
 function delay(ms: number) {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-function ensureHashtagDigits(str: string): string {
-    const pattern = /#(\d{4})$/;
-    if (!pattern.test(str)) {
-        return str + "#0";
-    }
-    return str;
-}
-
-
-async function getDiscordToNfts(ownerAddresses: string[], addressToNfts: Map<string, Map<string, number>>) {
+async function getDiscordToNfts(
+    ownerAddresses: string[],
+    addressToNfts: Map<string, Map<string, number>>,
+) {
     const chunked_addresses: string[][] = [];
     for (let i = 0; i < ownerAddresses.length; i += CHUNK_SIZE) {
         chunked_addresses.push(ownerAddresses.slice(i, i + CHUNK_SIZE));
@@ -74,19 +68,19 @@ async function getDiscordToNfts(ownerAddresses: string[], addressToNfts: Map<str
             let member = null;
             while (member == undefined) {
                 try {
-                    member = await SoonaverseApiManager.getMemberById(address);
-                } catch (error) { console.log("Throttling error, retrying"); await delay(1000) };
-
+                    member = await getMemberById(address);
+                } catch (error) {
+                    console.log("Throttling error, retrying");
+                    await delay(1000);
+                }
             }
             if (member.discord) {
-                const memberTag = ensureHashtagDigits(member.discord);
-                discordToNfts.set(memberTag, addressToNfts.get(member.uid));
+                discordToNfts.set(member.discord, addressToNfts.get(member.uid));
             }
         });
     }
     return discordToNfts;
 }
-
 
 function rolesToAllocate(membersNfts: Map<string, number>): Set<string> {
     const allocateRoles: Set<string> = new Set();
@@ -109,8 +103,7 @@ function rolesToAllocate(membersNfts: Map<string, number>): Set<string> {
 }
 
 async function syncBatchRoles(nftHolders: Map<string, Map<string, number>>) {
-    console.log('Syncing Roles');
-    // console.log(nftHolders);
+    console.log("Syncing Roles");
     let guild = await DISCORD_CLIENT.guilds.fetch(GUILD_ID);
     await guild.members.fetch().then(async (members) => {
         for (const memberList of members) {
@@ -138,16 +131,16 @@ async function syncBatchRoles(nftHolders: Map<string, Map<string, number>>) {
                 // remove them from other roles they are no longer a part of
                 for (const roleList of memberRoles) {
                     const role = roleList[1];
-                    if (ROLE_IDS.has(role.id) && !(allocateRoles.has(role.id))) {
+                    if (ROLE_IDS.has(role.id) && !allocateRoles.has(role.id)) {
                         await member.roles.remove(role.id);
-                        console.log(member.user.tag + ' - removed role: ' + role.id);
+                        console.log(member.user.tag + " - removed role: " + role.id);
                     }
                 }
                 // If member does not have the role, add them to it
                 for (const roleId of allocateRoles) {
                     if (!memberRoles.has(roleId)) {
-                        await member.roles.add(roleId, 'NFT-Holder');
-                        console.log(member.user.tag + ' - added role: ' + roleId);
+                        await member.roles.add(roleId, "NFT-Holder");
+                        console.log(member.user.tag + " - added role: " + roleId);
                     }
                 }
             } else {
@@ -156,11 +149,11 @@ async function syncBatchRoles(nftHolders: Map<string, Map<string, number>>) {
                     const role = roleList[1];
                     if (ROLE_IDS.has(role.id)) {
                         await member.roles.remove(role.id);
-                        console.log(member.user.tag + ' - removed role: ' + role.id);
+                        console.log(member.user.tag + " - removed role no holder: " + role.id);
                     }
                 }
             }
         }
     });
-    console.log('Finished syncing roles');
+    console.log("Finished syncing roles");
 }
